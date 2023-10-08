@@ -38,9 +38,8 @@ module Shale
     def initialize(name, type, collection, default)
       @name = name
       @setter = "#{name}="
-      @instance = type
+      @instance = type.instance_of?(Class) ? nil : type
       @type = type.instance_of?(Class) ? type : type.class
-      @is_instance = !type.instance_of?(Class)
       @collection = collection
       @default = collection ? -> { [] } : default
     end
@@ -52,10 +51,6 @@ module Shale
     # @api private
     def collection?
       @collection == true
-    end
-
-    def instance?
-      @is_instance
     end
   end
 end

@@ -172,7 +172,6 @@ module Shale
       # @api public
       def attribute(name, type, collection: false, default: nil)
         name = name.to_sym
-        non_instance_type = type.instance_of?(Class) ? type : type.class
 
         unless default.nil? || default.respond_to?(:call)
           raise DefaultNotCallableError.new(to_s, name)
@@ -191,7 +190,7 @@ module Shale
           attr_reader :#{name}
 
           def #{name}=(val)
-            @#{name} = #{collection} ? val : #{non_instance_type}.cast(val)
+            @#{name} = #{collection} ? val : #{@attributes[name].type}.cast(val)
           end
         RUBY
       end

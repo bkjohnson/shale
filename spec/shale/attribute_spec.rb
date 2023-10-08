@@ -25,16 +25,17 @@ RSpec.describe Shale::Attribute do
     end
   end
 
-  describe '#instance?' do
+  describe '#instance' do
     context 'when type is not an instance' do
-      it 'returns false' do
-        expect(described_class.new('foo', String, false, nil).instance?).to eq(false)
+      it 'returns nil' do
+        expect(described_class.new('foo', String, false, nil).instance).to eq(nil)
       end
     end
 
     context 'when type is an instance' do
       it 'returns true' do
-        expect(described_class.new('foo', 'foo', false, nil).instance?).to eq(true)
+        ins = String.new('foo')
+        expect(described_class.new('foo', ins, false, nil).instance).to eq(ins)
       end
     end
   end
