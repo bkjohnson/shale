@@ -25,6 +25,8 @@ module Shale
     # @api private
     attr_reader :setter
 
+    attr_reader :instance
+
     # Initialize Attribute object
     #
     # @param [Symbol] name Name of the attribute
@@ -36,7 +38,9 @@ module Shale
     def initialize(name, type, collection, default)
       @name = name
       @setter = "#{name}="
-      @type = type
+      @instance = type
+      @type = type.instance_of?(Class) ? type : type.class
+      @is_instance = !type.instance_of?(Class)
       @collection = collection
       @default = collection ? -> { [] } : default
     end
@@ -48,6 +52,10 @@ module Shale
     # @api private
     def collection?
       @collection == true
+    end
+
+    def instance?
+      @is_instance
     end
   end
 end

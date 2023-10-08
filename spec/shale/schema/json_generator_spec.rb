@@ -21,6 +21,21 @@ module ShaleSchemaJSONGeneratorTesting
     end
   end
 
+  class BoundedNumberType < Shale::Type::Integer
+    attr_reader :min, :max
+
+    def initialize(min, max) # rubocop:disable Lint/MissingSuper
+      @min = min
+      @max = max
+    end
+  end
+
+  class BoundedNumberJSONType < Shale::Schema::JSONGenerator::Base
+    def as_type
+      { 'type' => 'number', 'minimum' => instance.min, 'maximum' => instance.max }
+    end
+  end
+
   class Root < Shale::Mapper
     attribute :boolean, Shale::Type::Boolean
     attribute :date, Shale::Type::Date
@@ -72,6 +87,10 @@ module ShaleSchemaJSONGeneratorTesting
     attr_accessor :first_name, :last_name, :address
   end
 
+  class Pet
+    attr_accessor :name, :age
+  end
+
   class AddressMapper < Shale::Mapper
     model Address
     attribute :street, Shale::Type::String
@@ -83,6 +102,12 @@ module ShaleSchemaJSONGeneratorTesting
     attribute :first_name, Shale::Type::String
     attribute :last_name, Shale::Type::String
     attribute :address, AddressMapper
+  end
+
+  class PetMapper < Shale::Mapper
+    model Pet
+    attribute :name, Shale::Type::String
+    attribute :age, BoundedNumberType.new(0, 150)
   end
 end
 
@@ -330,6 +355,37 @@ RSpec.describe Shale::Schema::JSONGenerator do
         )
 
         expect(schema).to eq(expected_schema)
+      end
+
+      context 'with instanciated attribute types' do
+        let(:expected_schema_with_instantiated_types_hash) do
+          {
+            '$schema' => 'https://json-schema.org/draft/2020-12/schema',
+            '$ref' => '#/$defs/ShaleSchemaJSONGeneratorTesting_Pet',
+            '$defs' => {
+              'ShaleSchemaJSONGeneratorTesting_Pet' => {
+                'type' => 'object',
+                'properties' => {
+                  'name' => { 'type' => %w[string null] },
+                  'age' => { 'type' => %w[number null], 'minimum' => 0, 'maximum' => 150 },
+                },
+              },
+            },
+          }
+        end
+
+        it 'passes instance to JSON type' do
+          described_class.register_json_type(
+            ShaleSchemaJSONGeneratorTesting::BoundedNumberType,
+            ShaleSchemaJSONGeneratorTesting::BoundedNumberJSONType
+          )
+
+          schema = described_class.new.as_schema(
+            ShaleSchemaJSONGeneratorTesting::PetMapper
+          )
+
+          expect(schema).to eq(expected_schema_with_instantiated_types_hash)
+        end
       end
     end
   end

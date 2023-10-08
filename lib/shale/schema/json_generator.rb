@@ -96,7 +96,11 @@ module Shale
                 default = attribute.type.as_json(value)
               end
 
-              json_type = json_klass.new(mapping.name, default: default)
+              if attribute.instance?
+                json_type = json_klass.new(mapping.name, default: default, instance: attribute.instance)
+              else
+                json_type = json_klass.new(mapping.name, default: default)
+              end
             end
 
             json_type = Collection.new(json_type) if attribute.collection?
