@@ -19,8 +19,8 @@ module Shale
         # @api private
         attr_writer :nullable
 
-        def initialize(name, default: nil, mapping: nil)
-          @name = name.gsub('::', '_')
+        def initialize(mapping: nil, default: nil)
+          @name = mapping&.name&.gsub('::', '_')
           @default = default
           @mapping = mapping
           @nullable = true

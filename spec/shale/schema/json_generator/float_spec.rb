@@ -1,12 +1,13 @@
 # frozen_string_literal: true
 
 require 'shale/schema/json_generator/float'
+require 'shale/mapping/descriptor/dict'
 
 RSpec.describe Shale::Schema::JSONGenerator::Float do
   describe '#as_type' do
     it 'returns JSON Schema fragment as Hash' do
       expected = { 'type' => 'number' }
-      expect(described_class.new('foo').as_type).to eq(expected)
+      expect(described_class.new.as_type).to eq(expected)
     end
 
     context 'when mapping is passed with a schema' do
@@ -34,7 +35,7 @@ RSpec.describe Shale::Schema::JSONGenerator::Float do
           'maximum' => 100,
           'multipleOf' => 4,
         }
-        expect(described_class.new('foo', mapping: mapping).as_type).to eq(expected)
+        expect(described_class.new(mapping: mapping).as_type).to eq(expected)
       end
 
       it 'can use a subset of schema keywords' do
@@ -48,7 +49,7 @@ RSpec.describe Shale::Schema::JSONGenerator::Float do
           schema: { minimum: 1 }
         )
         expected = { 'type' => 'number', 'minimum' => 1 }
-        expect(described_class.new('foo', mapping: mapping).as_type).to eq(expected)
+        expect(described_class.new(mapping: mapping).as_type).to eq(expected)
       end
 
       it 'will not use keywords for other types' do
@@ -62,7 +63,7 @@ RSpec.describe Shale::Schema::JSONGenerator::Float do
           schema: { unique_items: true }
         )
         expected = { 'type' => 'number' }
-        expect(described_class.new('foo', mapping: mapping).as_type).to eq(expected)
+        expect(described_class.new(mapping: mapping).as_type).to eq(expected)
       end
     end
   end

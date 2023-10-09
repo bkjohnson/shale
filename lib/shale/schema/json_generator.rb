@@ -97,9 +97,8 @@ module Shale
               end
 
               json_type = json_klass.new(
-                mapping.name,
-                default: default,
-                mapping: mapping
+                mapping: mapping,
+                default: default
               )
             end
 
